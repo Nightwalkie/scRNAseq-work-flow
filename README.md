@@ -46,11 +46,11 @@ required_package <- c(
 
 | 模块 | 分 prompt | 代码模板 | 何时使用 |
 |---|---|---|---|
-| 文件管理 | [files.md](files.md) | 无 | 所有任务必须遵循 |
-| 单细胞处理 | [QC.md](QC.md) | [QC.R](QC.R) | 从原始计数进行读取、QC、去双胞、SCT、PCA、按需 Harmony、聚类、UMAP 和 FindAllMarkers |
-| 绘图 | [plot.md](plot.md) | [plot.R](plot.R) | marker DotPlot、FeaturePlot、比例图、表达分布、热图等；按 plot.md 的目录选择所需画法 |
+| 文件管理 | [files.md](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/files.md) | 无 | 所有任务必须遵循 |
+| 单细胞处理 | [QC.md](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/QC.md) | [QC.R](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/QC.R) | 从原始计数进行读取、QC、去双胞、SCT、PCA、按需 Harmony、聚类、UMAP 和 FindAllMarkers |
+| 绘图 | [plot.md](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/plot.md) | [plot.R](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/plot.R) | marker DotPlot、FeaturePlot、比例图、表达分布、热图等；按 plot.md 的目录选择所需画法 |
 
-- 相对链接以本总 prompt 所在的仓库目录为基准。读取当前文件内容，不凭记忆沿用旧参数。通过 GitHub 访问时应读取正文，不能只看文件名或目录列表。
+- 以上链接指向本仓库 `main` 分支中的对应文件。读取当前文件内容，不凭记忆沿用旧参数。通过 GitHub 访问时应读取正文，不能只看文件名或目录列表。
 - 先读 `files.md`，再读所需分析分 prompt，最后读对应代码。QC 读取完整流程；plot 读取所选画法及其依赖的辅助代码。
 - 任务超出现有模块时，说明缺少的能力，并就额外实现的范围向用户确认。
 - 用户明确要求优先；本文件负责资源、依赖与模块组合，`files.md` 负责文件位置，各分 prompt 负责算法和交互顺序，R 模板提供实现与默认参数。遇到影响结果或运行安全的冲突，先说明再处理，不静默猜测。
