@@ -11,7 +11,7 @@ setwd("E:/Bioinformatics/Learning/R WorkFlow")
 out_dir <- "results/QC"
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 
-# 兼容当前 irlba：fastpath = FALSE，PCA 用 20/30 维（50 维实测崩溃）。
+# 兼容当前 irlba：fastpath = FALSE
 # 以下局部适配也覆盖 DoubletFinder 内部的 PCA，不修改已安装的包。
 df <- new.env(parent = asNamespace("DoubletFinder"))
 df$RunPCA <- function(object, ...) Seurat::RunPCA(object, ..., fastpath = FALSE)
