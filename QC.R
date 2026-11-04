@@ -19,7 +19,7 @@ library(presto)  # 加速 FindAllMarkers 的 wilcox 检验
 future::plan("sequential")
 set.seed(44)
 
-setwd("E:/Bioinformatics/Learning/R WorkFlow")
+setwd("~/scRNAseq_project")
 out_dir <- "Results/QC"
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 
