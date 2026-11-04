@@ -25,7 +25,7 @@
 - 所有固定参数先沿用当前 QC.R；用户给出修改值后，再直接修改相应调用。
 - QC 阈值、`npcs`、`dims`、`dims.use`、`PCs`、`resolution`、双胞率、marker 阈值和随机种子等，直接写在函数调用或筛选表达式中。不要另建 `min_features`、`dims_use`、`resolution`、`seed` 等参数变量或配置表。
 - 对象、文件路径、样本元数据，以及实际计算得到的 `pK`、`nExp` 等结果可以使用变量；不要把固定默认值伪装成计算结果集中保存。
-- 用户调整维度后，直接同步修改同一阶段相关调用中的字面值；去双胞阶段与 SCT 后的主分析阶段分别选择维度。所选维度不得超出已计算的 PCA 范围。
+- 用户调整维度后，直接同步修改同一阶段相关调用中的字面值；去双胞前的临时 PCA 沿用模板维度，SCT 后的主分析阶段单独选择维度。所选维度不得超出已计算的 PCA 范围。
 - 注释简洁，突出步骤和需要用户决定的位置。环境核对在运行前完成，不在分析模块之间堆放防崩溃、缺失值检查或自动兜底的 `if` 语句。
 
 ## 4. 必须分阶段看图和选择参数
@@ -42,9 +42,8 @@
 
 ### PCA：先画 ElbowPlot，再决定维度
 
-- 每次用于后续分析的 `RunPCA()` 后，先绘制并展示 `ElbowPlot()`，暂停让用户选择维度，再执行对应的 `RunHarmony()`、`FindNeighbors()` 或其他使用这些维度的步骤。
-- 此规则也适用于去双胞前的临时 PCA：在初步邻居计算、聚类和 DoubletFinder 之前增加 ElbowPlot 与维度选择步骤。不能因为 QC.R 的该处没有画图就跳过。
-- SCT 后重新计算主分析 PCA，并重新展示 ElbowPlot；不要直接沿用去双胞阶段的维度选择。图中应覆盖供用户选择的 PCA 范围。
+- SCT 后的主分析 `RunPCA()` 完成后，先绘制并展示 `ElbowPlot()`，暂停让用户选择维度，再执行对应的 `RunHarmony()`、`FindNeighbors()` 或其他使用这些维度的步骤。图中应覆盖供用户选择的 PCA 范围。
+- 去双胞前的临时 PCA 仅服务于初步聚类和 DoubletFinder，直接沿用 QC.R 的维度，无需绘制 ElbowPlot 或暂停选择；主分析维度不沿用该处设置。
 - 多批次顺序为 **SCT → PCA → ElbowPlot → 用户选择维度 → Harmony → FindNeighbors → FindClusters → UMAP**；单批次跳过 Harmony。聚类和 UMAP 使用同一套选定的降维结果。
 
 如果用户已经明确给出了相应阈值或维度，可以按该选择继续，不重复询问；仍应先出图并保持上述计算顺序。仅提供代码时，清楚标注分阶段运行及暂停位置；具备执行能力时，必须实际分段执行，不能只写暂停注释后仍一次性 `source()` 整份脚本。
@@ -54,11 +53,11 @@
 按以下顺序组织代码，除输入适配及上述看图步骤外，沿用 QC.R 的实现：
 
 1. 数据读取、QC 指标、筛选前 QC 图、用户确定阈值、筛选及筛选后 QC 图。
-2. 常规归一化、变异基因、ScaleData、临时 PCA、ElbowPlot、维度选择、初步聚类。
-3. DoubletFinder 的 pK 扫描、按 BCmetric 选择 pK、同型双胞比例校正、双胞识别及保留 singlet。模板中的双胞率是示例值，用户可根据平台和上样量修改。
+2. 常规归一化、变异基因、ScaleData、临时 PCA、初步聚类。
+3. DoubletFinder 的 pK 扫描、按 BCmetric 选择 pK、同型双胞比例校正、双胞识别及保留 singlet。模板中的双胞率是示例值，用户可根据平台和上样量修改；`num.cores` 按资源确认结果调整。该阶段不保存 pK、双胞等中间 CSV 或 PDF。
 4. 多文库先合并 singlet；执行 SCT、主分析 PCA、ElbowPlot 及维度选择。
 5. 多批次按需运行 Harmony；使用选定的 PCA 或 Harmony 嵌入计算邻居、聚类和 UMAP。
-6. 按 QC.R 对 RNA assay 进行归一化，使用 `FindAllMarkers()` 的 LR 检验寻找各群 marker；固定参数沿用模板，不把 Harmony 嵌入当作基因表达量。
+6. 按 QC.R 对 RNA assay 进行归一化，使用 `FindAllMarkers()` 默认的 wilcox 检验（由 presto 加速）寻找各群 marker；固定参数沿用模板，不把 Harmony 嵌入当作基因表达量。
 7. 输出最终结果。
 
 ## 6. 输出与完成说明
@@ -66,5 +65,5 @@
 - **不保存任何中间 checkpoint RDS，也不以其他文件名保存中间对象。全流程只在最后保存一个完整的 final RDS。**
 - 暂停看图时将对象保留在同一个 R 会话中；会话中断后从原始输入重跑必要步骤，不为了恢复运行而添加 checkpoint。
 - final RDS 保留完整 Seurat 对象、样本元数据、RNA/SCT assay、最终降维和聚类结果，以及 QC.R 中保存的 marker 结果和运行环境信息。运行 Harmony 时同时保留其结果。
-- 过程中可以按 files.md 输出 QC 图、pK 图、ElbowPlot、UMAP、marker CSV 和细胞元数据 CSV。
+- 过程中可以按 files.md 输出 QC 图、ElbowPlot、UMAP、marker CSV 和细胞元数据 CSV。
 - 完成时简要说明文件位置、相对模板的必要调整、实际执行到的阶段，以及依赖差异、警告或尚待用户决定的参数。没有实际运行的步骤不能声称已经跑通。

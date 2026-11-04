@@ -24,7 +24,7 @@
 
 - R 脚本使用命名字符向量：包名为名称，版本号为值。该清单用于说明依赖，不等于自动安装指令。
 - 包括实际调用的包（含 `包名::函数`），以及影响兼容性的关键依赖；按所选模块整理，不把整个模板库的绘图依赖全部加入。
-- QC 的核心目标版本如下；这只是核心清单，生成实际代码时仍须补齐所用的 DoubletFinder、sctransform、ggplot2，以及启用 Harmony 时的 harmony 等包及其适用版本：
+- QC 的核心目标版本如下；这只是核心清单，完整清单见 QC.R 开头的 `required_package`（含 DoubletFinder、harmony、ggplot2、sctransform、presto 等）：
 
 ```r
 required_package <- c(
@@ -74,7 +74,7 @@ required_package <- c(
 ## 5. 组合后仍必须遵守的顺序与写法
 
 - **QC 图先于 QC 的 `subset()`。** 先展示筛选前图，让用户选择或明确接受阈值，再筛选；多样本的出图循环和筛选循环必须分开，中间实际暂停。
-- **PCA 后先展示 ElbowPlot，再进入 Harmony、FindNeighbors 等依赖维度的步骤。** 去双胞前临时 PCA 与 SCT 后主 PCA 分别选择维度，不能跳过其中一个阶段。
+- **SCT 后的主分析 PCA 先展示 ElbowPlot，再进入 Harmony、FindNeighbors 等依赖维度的步骤。** 去双胞前的临时 PCA 沿用模板维度，无需 ElbowPlot。
 - 用户已明确给出相应阈值或维度时无需重复提问，但仍保留先出图的顺序。仅写暂停注释后一次性运行整份脚本，不算执行了暂停。
 - 单次使用的流程直接展开，不另封装函数。`plot.R` 虽以函数保存范例，应用时必须提取所需函数体，直接调用底层绘图接口；不能用 `source("plot.R")` 加模板函数调用代替展开后的代码。
 - 普通固定参数直接写在函数调用或筛选表达式内，不建立阈值、dims、分辨率、图片尺寸等参数配置表。对象、输入基因集、路径、计算结果，以及前述资源配置和 `required_package` 可以使用变量。
