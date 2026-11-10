@@ -1,4 +1,4 @@
-# 绘图模板索引：见 plot.md。28 个绘图/导出函数 + 1 个趋势聚类辅助函数。
+# 绘图模板索引：见 plot.md。27 个绘图/导出函数 + 1 个趋势聚类辅助函数。
 # 不包含 DimPlot；不自动执行分析、安装依赖或保存 RDS。
 # 函数仅用于组织范例；实际应用请展开所需函数体，固定参数写在调用处。
 # 基线：Seurat 4.3.0.1 / SeuratObject 4.1.3 / ggplot2 3.4.2。
@@ -603,51 +603,32 @@ heatmap_diff_seurat <- function(datafilt, diffdata, group.by = "seurat_clusters"
         cluster_rows = F, show_row_dend = F, cluster_columns = F, show_column_dend = F, row_names_gp = grid::gpar(fontsize = font.size))
 }
 
-# prop_plot_hca：堆积比例图；input 包含 Var1、Var2、Freq ----
-prop_plot_hca <- function(input, rotate = 45, decreasing = T, species = "human") {
-    input$Var2 <- as.character(input$Var2)
-    name <- unique(gtools::mixedsort(input$Var2, decreasing = decreasing))
-    input$Var2 <- factor(input$Var2, levels = name)
-    if (species == "human") {
-        col <- c(CD8T = "#B8E3EA", CD4T = "#0070B2", Treg = "#A6D719", NKcell = "#F15E4C", Bcell = "#A231A1", 
-            DC = "#D5B81B", Macro = "#028090", Mono = "#B2DBBF", MAST = "#B32226", Neutrophil = "#00A9A3", 
-            Fibroblast = "#FBD324", Endothelial = "#CD6981", tumor = "#9CAEA9", None = "#F6F5BD")
+# prop_stack_sample：按样本或组的细胞类型比例堆积柱状图；纵轴为组内百分比 ----
+prop_stack_sample <- function(datafilt, group = "group", cluster = "celltype", output = NULL, width = 5, height = 6) {
+    info <- datafilt@meta.data
+    input <- data.frame(table(group = info[, group], celltype = info[, cluster]))
+    names(input)[3] <- "n"
+    input <- input[input$n > 0, ]
+    input$pct <- input$n/ave(input$n, input$group, FUN = sum) * 100
+    col <- c("#1BA188", "#E8825A", "#3B5488", "#5BC0DE", "#E8422F", "#8DD3C7", "#F4A582", "#5E8CB0", 
+        "#B5A5D0", "#66B266", "#F0C05A", "#D6604D", "#80CDC1", "#9F7BB8", "#C49A6C")
+    celltype <- levels(factor(info[, cluster]))
+    if (length(celltype) > length(col)) {
+        col <- colorRampPalette(col)(length(celltype))
     }
-    else if (species == "mouse") {
-        col <- c(CD8T = "#B8E3EA", CD4T = "#0070B2", Treg = "#A6D719", NKcell = "#F15E4C", Bcell = "#A231A1", 
-            DC = "#D5B81B", MoMac = "#B2DBBF", MAST = "#B32226", Neutrophil = "#00A9A3", Fibroblast = "#FBD324", 
-            Endothelial = "#CD6981", tumor = "#9CAEA9", None = "#F6F5BD")
+    col <- setNames(col[seq_along(celltype)], celltype)
+    plot <- ggplot2::ggplot(input, ggplot2::aes(x = group, y = pct, fill = celltype)) + ggplot2::geom_col(position = "stack", 
+        width = 0.7, alpha = 0.5) + ggplot2::scale_fill_manual(values = col) + ggplot2::scale_y_continuous(breaks = c(0, 
+        25, 50, 75, 100), minor_breaks = c(12.5, 37.5, 62.5, 87.5), expand = c(0, 0)) + ggplot2::labs(x = "", 
+        y = "Percentage (%)", fill = "") + ggplot2::theme_classic() + ggplot2::theme(panel.grid.major.y = ggplot2::element_line(color = "grey90", 
+        linewidth = 0.4), axis.text = ggplot2::element_text(color = "black", size = 14), axis.title = ggplot2::element_text(size = 14), 
+        legend.text = ggplot2::element_text(size = 12))
+    if (is.null(output)) {
+        plot
     }
-    ggplot2::ggplot(input, ggplot2::aes(x = Var1, y = Freq, fill = Var2)) + ggplot2::geom_bar(stat = "identity", 
-        position = "fill", width = 0.75) + ggplot2::scale_fill_manual(values = col) + ggplot2::theme_bw() + 
-        ggplot2::theme(panel.grid = ggplot2::element_blank(), legend.key.size = grid::unit(0.75, "cm"), 
-            legend.text = ggplot2::element_text(size = 15), legend.title = ggplot2::element_blank(), 
-            axis.text = ggplot2::element_text(colour = "black", size = 15), axis.title = ggplot2::element_text(colour = "black", 
-                size = 15)) + ggplot2::scale_y_continuous(expand = c(0, 0)) + ggplot2::labs(x = "", y = "Proportion", 
-        title = "") + ggplot2::theme(axis.text.x = ggplot2::element_text(angle = rotate, hjust = 1))
-}
-
-# prop_sample_compare：先按样本计算比例，再比较两个实验组 ----
-prop_sample_compare <- function(datafilt, sample = "sample", group = "group", cluster = "celltype", output.name = NULL, 
-    ncol = 5) {
-    metadata <- datafilt[[]]
-    counts <- table(metadata[[sample]], metadata[[cluster]])
-    input <- as.data.frame(prop.table(counts, margin = 1))
-    names(input) <- c("sample", "celltype", "proportion")
-    design <- unique(data.frame(sample = metadata[[sample]], group = metadata[[group]]))
-    input <- merge(input, design, by = "sample")
-    plots <- lapply(gtools::mixedsort(unique(as.character(input$celltype))), function(celltype) {
-        values <- input[input$celltype == celltype, ]
-        ggplot2::ggplot(values, ggplot2::aes(group, proportion, fill = group)) + ggplot2::geom_boxplot(width = 0.55, 
-            outlier.shape = NA) + ggbeeswarm::geom_quasirandom(width = 0.2, size = 2) + ggpubr::stat_compare_means(method = "t.test") + 
-            ggplot2::scale_fill_manual(values = c("#FBD324", "#A37CB7")) + ggplot2::theme_bw() + ggplot2::theme(legend.position = "none") + 
-            ggplot2::labs(x = NULL, y = "Cell proportion", title = celltype)
-    })
-    plot <- cowplot::plot_grid(plotlist = plots, ncol = ncol)
-    if (!is.null(output.name)) 
-        ggplot2::ggsave(output.name, plot, width = 4 * ncol, height = 5 * ceiling(length(plots)/ncol), 
-            limitsize = FALSE)
-    plot
+    else {
+        ggplot2::ggsave(output, plot, width = width, height = height, dpi = 300)
+    }
 }
 
 # heatmap_text：数值矩阵热图，标注超过绝对值阈值的数值 ----

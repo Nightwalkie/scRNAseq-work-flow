@@ -1,6 +1,6 @@
 # 单细胞绘图：代码生成与执行 Prompt
 
-你是一名单细胞分析智能体。请结合用户的绘图目标，读取 [plot.R](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/plot.R) 中对应的范例，并遵循 [files.md](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/files.md) 生成绘图代码。本模块包含 28 个绘图／导出函数和 1 个趋势聚类辅助函数，不包含 `dimplot_new`、`export_dimplot`，也不负责重新进行 QC、差异分析或拟时序推断。
+你是一名单细胞分析智能体。请结合用户的绘图目标，读取 [plot.R](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/plot.R) 中对应的范例，并遵循 [files.md](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/files.md) 生成绘图代码。本模块包含 27 个绘图／导出函数和 1 个趋势聚类辅助函数，不包含 `dimplot_new`、`export_dimplot`，也不负责重新进行 QC、差异分析或拟时序推断。
 
 ## 1. 函数是模板的存储形式，应用时必须展开
 
@@ -46,8 +46,7 @@ ggplot2::ggsave(file.path(out_dir, "marker_dotplot.png"), p,
 | 基因表达分布比较 | `exp_distribution`、`exp_distribution_boxplot`、`exp_distribution_ecdf` | Seurat 对象、基因和分组；分别为均值／散点图、箱线图、累积分布图 |
 | 通用累积分布图 | `ecdf_plot` | 包含 value、type 的长表 |
 | top marker 平均表达热图 | `heatmap_diff_seurat` | Seurat 对象、差异基因表和分组字段 |
-| 堆积细胞比例图 | `prop_plot_hca` | Var1 为样本或组，Var2 为细胞类型，Freq 为细胞数的长表 |
-| 按样本比较细胞比例 | `prop_sample_compare` | 样本、实验组及细胞类型字段；先算各样本比例，再比较两个实验组 |
+| 按样本堆积细胞比例图 | `prop_stack_sample` | Seurat 对象、样本或组字段（如由 `orig.ident` 派生）及细胞类型字段；纵轴为各样本／组内的细胞类型百分比 |
 | 数值矩阵热图 | `heatmap_text` | 行列有名称的数值矩阵；标注绝对值超过阈值的数值 |
 | 细胞组成环形图 | `seurat_circ_prop` | 分组字段和细胞类型 |
 | 评分散点与误差线 | `sc_pointplot_stat` | value、type 长表；展示均值 ± SD 或 SEM，并可进行组间检验 |
@@ -77,7 +76,7 @@ ggplot2::ggsave(file.path(out_dir, "marker_dotplot.png"), p,
 - 展示基因表达时区分原始 counts、标准化表达和跨组 Z-score。`heatmap_diff_seurat` 展示组内平均 RNA 标准化表达的行 Z-score；`heatmap_dotplot_marker` 使用 DotPlot 的缩放平均表达和表达比例，二者数值定义不同。
 - FeaturePlot 的分位数截断仅用于色阶展示，不删除细胞，也不改写原始表达或评分。不同组需要比较颜色时使用一致的色阶。
 - `diff_loadingplot` 的纵轴是 log2FC；`diff_signal_acrossclust` 计算的是两组均值之差，不能标成 log2FC。`prop_back2back_lollipop` 才计算两组比例的 log2 比值；有零比例时应明确处理方式，不能悄悄加伪计数后隐藏说明。
-- `prop_sample_compare` 中每个点代表一个样本。其他表达／评分比较函数中每个点通常代表一个细胞；若目标是实验组之间的推断，应先确定统计单位、重复样本及配对关系，不能把细胞级检验当成样本级检验。
+- 表达／评分比较函数中每个点通常代表一个细胞；若目标是实验组之间的推断，应先确定统计单位、重复样本及配对关系，不能把细胞级检验当成样本级检验。
 - 检验方法、分组顺序及多重比较处理按研究设计明确设置；图上的 SD、SEM、均值、P 值含义与实际计算保持一致。富集热图只展示输入结果，不重新计算或更改显著性结论。
 - 趋势函数的 `nbin = 50` 沿用原代码，含义是每箱约 50 个细胞，实际箱数约为细胞数除以 nbin。两处趋势处理使用一致的分箱和平滑设置，保留足够的箱数。热图顶部的 0–100 标度表示排序后的相对位置，不是重新估计的时间距离。
 - `heatmap_dotplot_marker` 中圆面积随表达细胞比例变化，`dot.scale = 1` 是本模板的默认尺寸倍率。四象限图中等于阈值的点归入低值侧；`median.thres = TRUE` 会逐组取中位数，跨组比较固定阈值时使用共同的明确边界。
