@@ -66,7 +66,6 @@ ggplot2::ggsave(file.path(out_dir, "marker_dotplot.png"), p,
 
 - 用户同时要求 QC 和画图时，先按 QC.md 完成相应阶段，再加入绘图代码。已有满足条件的对象或结果表时直接使用，不重复运行 SCT、Harmony、聚类、FindAllMarkers 或基因集评分。
 - QC 图必须在 QC 的 `subset()` 前展示并按 QC.md 等待用户选择阈值；多样本的筛选前出图与筛选使用不同循环。
-- PCA 维度选择仍遵循 QC.md 的 ElbowPlot 顺序，不因增加绘图模块而跳过暂停点。
 - 绘制 UMAP 表达图需要已有 UMAP；绘制富集热图需要已有富集结果；绘制趋势图需要已有参考值。缺少上游结果时说明具体缺项，由总 prompt 调度对应分析模块，不能伪造分析结果或把细胞顺序当成推断出的拟时序。
 - marker 图可以依据 cluster 绘制，尚未完成细胞类型注释时使用真实的 cluster 字段，不擅自补上细胞类型标签。
 

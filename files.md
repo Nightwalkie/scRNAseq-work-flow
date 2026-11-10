@@ -52,7 +52,6 @@
 │   └── QC/
 │       ├── sample1_QC_before.png
 │       ├── sample2_QC_before.png
-│       ├── PCA_elbow.png
 │       ├── UMAP_clusters.png
 │       ├── FindAllMarkers.csv
 │       ├── cell_metadata.csv

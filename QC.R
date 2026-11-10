@@ -93,8 +93,6 @@ DefaultAssay(obj) <- "SCT"
 
 # 3. PCA；单批次直接使用 PCA 嵌入。
 obj <- RunPCA(obj, assay = "SCT", npcs = 50, fastpath = FALSE, seed.use = 44, verbose = FALSE)
-ggsave(file.path(out_dir, "PCA_elbow.png"), ElbowPlot(obj, ndims = 30),
-       width = 6, height = 4, dpi = 200)
 # 多批次时填入真实 sample_id，启用 Harmony，并把下方两处 reduction 改为 "harmony"。
 # obj <- RunHarmony(obj, group.by.vars = "sample_id", reduction.use = "pca",
 #                   dims.use = 1:30, project.dim = FALSE)
