@@ -49,6 +49,8 @@ required_package <- c(
 |---|---|---|---|
 | 文件管理 | [files.md](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/files.md) | 无 | 所有任务必须遵循 |
 | 单细胞处理 | [QC.md](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/QC.md) | [QC.R](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/QC.R) | 从原始计数进行读取、QC、去双胞、SCT、PCA、按需 Harmony、聚类、UMAP 和 FindAllMarkers |
+| 细胞注释 | [Annotation.md](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/Annotation.md) | [Annotation.R](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/Annotation.R) | 读取 QC 的 final RDS，看 marker DotPlot 后手动注释 cluster，画注释后的 UMAP 和 DotPlot |
+| marker 库 | 无 | [Markers.R](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/Markers.R) | 按物种和组织选择 marker 列表，供注释和绘图使用 |
 | 绘图 | [plot.md](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/plot.md) | [plot.R](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/plot.R) | marker DotPlot、FeaturePlot、比例图、表达分布、热图等；按 plot.md 的目录选择所需画法 |
 
 - 以上链接指向本仓库 `main` 分支中的对应文件。读取当前文件内容，不凭记忆沿用旧参数。通过 GitHub 访问时应读取正文，不能只看文件名或目录列表。
