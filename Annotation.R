@@ -1,8 +1,9 @@
-# 读取 QC.R 的 final RDS，按 marker 手动注释 cluster；人类基因符号。
+# 读取 QC.R 的 final RDS，按 marker 手动注释 cluster，并导出 CellTypist 训练数据；人类基因符号。
 required_package <- c(
   Seurat = "4.3.0.1",
   SeuratObject = "4.1.3",
-  ggplot2 = "3.4.2"
+  ggplot2 = "3.4.2",
+  Matrix = "1.6-1"
 )
 
 library(Seurat)
@@ -150,3 +151,15 @@ ggsave(file.path(out_dir, "marker_dotplot_celltype.png"), p,
        dpi = 300, limitsize = FALSE)
 
 saveRDS(obj, file.path(out_dir, "scRNA_annotated.rds"))
+
+# 5. 导出 CellTypist 训练数据（供 Celltypist.py）：RNA assay 原始 counts（基因 × 细胞）及注释
+keep <- !(obj$celltype %in% c("Low quality"))   # 不进入模型的类型
+counts <- GetAssayData(obj, assay = "RNA", slot = "counts")[, keep]
+Matrix::writeMM(counts, file.path(out_dir, "counts.mtx"))
+writeLines(rownames(counts), file.path(out_dir, "genes.tsv"))
+writeLines(colnames(counts), file.path(out_dir, "barcodes.tsv"))
+write.csv(data.frame(barcode = colnames(counts),
+                     cell_type = as.character(obj$celltype[keep]),
+                     orig.ident = obj$orig.ident[keep]),
+          file.path(out_dir, "meta.csv"), row.names = FALSE)
+table(droplevels(obj$celltype[keep]))

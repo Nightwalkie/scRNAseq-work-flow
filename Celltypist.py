@@ -25,7 +25,7 @@ sc.settings.verbosity = 1
 os.chdir(os.path.expanduser("~/VisiumHD_project"))
 out_dir = "Results/Celltypist"
 os.makedirs(out_dir, exist_ok=True)
-ref_dir = os.path.expanduser("~/scRNAseq_project/Results/Annotation")
+ref_dir = os.path.expanduser("~/scRNAseq_project/Results/Annotation")   # Annotation.R 导出的训练数据
 
 # 1. 读取单细胞参考：counts.mtx 为基因 × 细胞，meta.csv 含 barcode 和 cell_type 列
 X = scipy.io.mmread(os.path.join(ref_dir, "counts.mtx")).T.tocsr().astype(np.float32)

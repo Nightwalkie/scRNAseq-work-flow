@@ -49,7 +49,7 @@ required_package <- c(
 |---|---|---|---|
 | 文件管理 | [files.md](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/files.md) | 无 | 所有任务必须遵循 |
 | 单细胞处理 | [QC.md](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/QC.md) | [QC.R](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/QC.R) | 从原始计数进行读取、QC、去双胞、SCT、PCA、按需 Harmony、聚类、UMAP 和 FindAllMarkers |
-| 细胞注释 | [Annotation.md](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/Annotation.md) | [Annotation.R](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/Annotation.R) | 读取 QC 的 final RDS，看 marker DotPlot 后手动注释 cluster，画注释后的 UMAP 和 DotPlot |
+| 细胞注释 | [Annotation.md](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/Annotation.md) | [Annotation.R](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/Annotation.R) | 读取 QC 的 final RDS，看 marker DotPlot 后手动注释 cluster，画注释后的 UMAP 和 DotPlot，导出 CellTypist 训练数据 |
 | CellTypist 训练 | [Celltypist.md](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/Celltypist.md) | [Celltypist.py](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/Celltypist.py) | 用已注释单细胞参考训练 CellTypist 模型，基因与 Visium HD 数据取交集 |
 | marker 库 | 无 | [Markers.R](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/Markers.R) | 按物种和组织选择 marker 列表，供注释和绘图使用 |
 | 绘图 | [plot.md](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/plot.md) | [plot.R](https://github.com/Nightwalkie/scRNAseq-work-flow/blob/main/plot.R) | marker DotPlot、FeaturePlot、比例图、表达分布、热图等；按 plot.md 的目录选择所需画法 |
