@@ -2,13 +2,11 @@
 required_package <- c(
   Seurat = "4.3.0.1",
   SeuratObject = "4.1.3",
-  ggplot2 = "3.4.2",
-  dplyr = "待核实"
+  ggplot2 = "3.4.2"
 )
 
 library(Seurat)
 library(ggplot2)
-library(dplyr)
 set.seed(44)
 
 setwd("~/scRNAseq_project")
@@ -21,10 +19,7 @@ Idents(obj) <- "seurat_clusters"
 table(obj$seurat_clusters)
 
 markers <- read.csv("Results/QC/FindAllMarkers.csv")
-top10 <- markers[markers$p_val_adj < 0.05, ] %>%
-  group_by(cluster) %>%
-  slice_max(avg_log2FC, n = 10)
-top10
+markers <- markers[markers$p_val_adj < 0.05, ]
 
 # 大类 marker：来自 Markers.R 的 PDAC_Maintype，其他组织从 Markers.R 选择后替换。
 mainType_marker <- list(
@@ -44,7 +39,7 @@ mainType_marker <- list(
   Neutrophil    = c("FCGR3B", "CEACAM8", "CSF3R"),
   Fibroblast    = c("COL1A1", "COL1A2"),
   Endothelial   = c("PECAM1", "VWF", "CDH5", "CLDN5"),
-  Acinar        = c("PRSS1", "CPA1", "CTRB", "AMY2A", "PNLIP"),
+  Acinar        = c("PRSS1", "CPA1", "CTRB1", "CTRB2", "AMY2A", "PNLIP"),
   Proliferating = c("MKI67", "TOP2A"),
   Epithelial    = c("EPCAM", "KRT8", "KRT18", "KRT19", "SOX9"),
   Endocrine     = c("CHGA", "INS", "GCG", "SST", "PPY"),
@@ -72,7 +67,7 @@ ggsave(file.path(out_dir, "marker_dotplot_seurat_clusters.png"), p,
        width = 4 + 0.35 * length(unlist(gene_list)), height = 2 + 0.4 * nlevels(obj$seurat_clusters),
        dpi = 300, limitsize = FALSE)
 
-# 2. 手动注释：查看上方 DotPlot 和 top10 后填写。
+# 2. 手动注释：查看上方 DotPlot 和 markers 后填写。
 # 每个 cluster 都要写，多个 cluster 可写同一类型；书写顺序即图中细胞类型顺序。以下为示例。
 anno <- c(
   "0" = "Epithelial",

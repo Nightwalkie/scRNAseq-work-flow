@@ -19,7 +19,7 @@ PDAC_Maintype <- list(
   Neutrophil    = c("FCGR3B", "CEACAM8", "CSF3R"),
   Fibroblast    = c("COL1A1", "COL1A2"),
   Endothelial   = c("PECAM1", "VWF", "CDH5", "CLDN5"),
-  Acinar        = c("PRSS1", "CPA1", "CTRB", "AMY2A", "PNLIP"),
+  Acinar        = c("PRSS1", "CPA1", "CTRB1", "CTRB2", "AMY2A", "PNLIP"),
   Proliferating = c("MKI67", "TOP2A"),
   Epithelial    = c("EPCAM", "KRT8", "KRT18", "KRT19", "SOX9"),
   Endocrine     = c("CHGA", "INS", "GCG", "SST", "PPY"),
