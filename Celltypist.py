@@ -37,8 +37,11 @@ ref = sc.AnnData(X=X, obs=meta.loc[barcodes].copy(), var=pd.DataFrame(index=gene
 ref.obs["cell_type"] = ref.obs["cell_type"].astype("category")
 print(ref)
 
-# 2. 与 HD 基因取交集；HD 为 .h5 时改用 sc.read_10x_h5()
-hd_genes = sc.read_h5ad("Results/QC/adata_QC.h5ad", backed="r").var_names
+# 2. 与 HD 基因取交集：基因名取自任一样本的细胞分割矩阵，读取方式与 QC_celltypist.py 一致
+hd = sc.read_10x_h5("Database/GSE123456/sample1/segmented_outputs/filtered_feature_cell_matrix.h5")
+hd.var_names_make_unique()
+hd_genes = hd.var_names
+del hd
 shared = ref.var_names.intersection(hd_genes)
 # 交集明显偏少时检查基因名格式：Seurat 会把 "_" 改成 "-"，重名基因后缀 ".1" 与 "-1" 不同
 print(f"参考基因 {ref.n_vars} | HD 基因 {len(hd_genes)} | 交集 {len(shared)}")
